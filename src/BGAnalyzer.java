@@ -1,6 +1,8 @@
 
-import java.util.*;/*
- Copyright (c) 2016 Nick Gable
+import java.util.*;
+
+/*
+ Copyright (c) 2016 Nick Gable (Servant Software)
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -39,9 +41,13 @@ public class BGAnalyzer
 	}
 	
 	public static OutputValue[] analyzeBG(InputReading [] readings, int bgrangelow, int bgrangehigh, Date starttime, Date endtime){
+		
+		
 		for (InputReading reading : readings){
 			if (!isInTimeRange(reading.time, starttime, endtime)){
 				
+			} else {
+				continue;
 			}
 		}
 		

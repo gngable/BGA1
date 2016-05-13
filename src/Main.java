@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2016 Nick Gable
+ Copyright (c) 2016 Nick Gable (Servant Software)
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 
 import java.util.*;
+import BGAnalyzer.*;
 
 public class Main
 {
@@ -29,10 +30,21 @@ public class Main
 	public static void main(String[] args)
 	{
 		// read test file
-		
+		BGAnalyzer.InputReading[] readings = readFile("bloodglucosetestdata.txt");
 		
 		//send the data to BGAnalyzer
+		BGAnalyzer.OutputValue[] values = BGAnalyzer.analyzeBG(readings, 80, 120, null, null);
 		
 		//print the result
+		displayOutput(values);
+	}
+
+	private static void displayOutput(BGAnalyzer.OutputValue[] values)
+	{
+		
+	}
+	
+	public static BGAnalyzer.InputReading[] readFile(String filename){
+		return null;
 	}
 }
