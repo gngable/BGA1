@@ -23,6 +23,8 @@
 
 import java.util.*;
 import BGAnalyzer.*;
+import java.io.*;
+import java.text.*;
 
 public class Main
 {
@@ -45,6 +47,32 @@ public class Main
 	}
 	
 	public static BGAnalyzer.InputReading[] readFile(String filename){
-		return null;
+		try{
+			List<BGAnalyzer.InputReading> readings = new ArrayList<>();
+			
+			BufferedReader br = new BufferedReader(new FileReader(filename));
+			
+			String line;
+			
+			DateFormat df = new SimpleDateFormat();
+			
+			while ((line = br.readLine()) != null){
+				String[] fields = line.split("/t");
+				
+				if (fields.length < 4) continue;
+				
+				BGAnalyzer.InputReading reading = new BGAnalyzer.InputReading();
+				
+				reading.reading = Integer.parseInt(fields[4]);
+				reading.time = df.parse(fields[4]);
+				
+				readings.add(reading);
+			}
+			
+			return readings.toArray(new BGAnalyzer.InputReading[readings.size()]);
+		} catch (Exception ex){
+			System.out.println("Error reading file: " + ex.getMessage());
+			return null;
+		}
 	}
 }

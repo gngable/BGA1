@@ -26,7 +26,7 @@ import java.util.*;
 
 public class BGAnalyzer
 {
-	public class InputReading{
+	public static class InputReading{
 		public Date time = null;
 		public int reading = 0;
 	}
