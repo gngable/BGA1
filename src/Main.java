@@ -31,9 +31,10 @@ public class Main
 	//this function is really just to test the BGAnalyzer class
 	public static void main(String[] args)
 	{
+		System.out.println("CWD is " + System.getProperty("user.dir"));
 		// read test file
-		BGAnalyzer.InputReading[] readings = readFile("bloodglucosetestdata.txt");
-		
+		BGAnalyzer.InputReading[] readings = readFile("/storage/emulated/0/AppProjects/BGA1/bloodglucosetestdata.txt");
+		System.out.println("Read " + readings.length + " records from the file");
 		//send the data to BGAnalyzer
 		BGAnalyzer.OutputValue[] values = BGAnalyzer.analyzeBG(readings, 80, 120, null, null);
 		
@@ -54,20 +55,47 @@ public class Main
 			
 			String line;
 			
-			DateFormat df = new SimpleDateFormat();
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+			
+			int totalcount =0;
+			int readcount = 0;
+			int shortcount = 0;
+			int notabs = 0;
 			
 			while ((line = br.readLine()) != null){
-				String[] fields = line.split("/t");
+				totalcount++;
 				
-				if (fields.length < 4) continue;
+				if (line.indexOf("\t") == -1){
+					notabs++;
+					continue;
+				}
 				
-				BGAnalyzer.InputReading reading = new BGAnalyzer.InputReading();
+				String[] fields = line.split("\t");
 				
-				reading.reading = Integer.parseInt(fields[4]);
-				reading.time = df.parse(fields[4]);
+				if (fields.length < 4){
+					shortcount++;
+					continue;
+				}
 				
-				readings.add(reading);
+				try {
+					BGAnalyzer.InputReading reading = new BGAnalyzer.InputReading();
+				
+					if (fields[4].trim().toLowerCase().indexOf("high") != -1){
+						reading.reading = 401;
+					} else {
+						reading.reading = Integer.parseInt(fields[4]);
+					}
+					
+					reading.time = df.parse(fields[3]);
+				
+					readings.add(reading);
+					readcount++;
+				} catch(Exception ex){
+					System.out.println("Non-fatal error, could not parse line/n<" + line + ">/nbecause: " + ex.getMessage());
+				}
 			}
+			
+			System.out.println("read " + readcount + " of " + totalcount + ". Short = " + shortcount + ". Notabs = " + notabs);
 			
 			return readings.toArray(new BGAnalyzer.InputReading[readings.size()]);
 		} catch (Exception ex){
