@@ -35,8 +35,11 @@ public class Main
 		// read test file
 		BGAnalyzer.InputReading[] readings = readFile("/storage/emulated/0/AppProjects/BGA1/bloodglucosetestdata.txt");
 		System.out.println("Read " + readings.length + " records from the file");
+		
+		
 		//send the data to BGAnalyzer
 		BGAnalyzer.OutputValue[] values = BGAnalyzer.analyzeBG(readings, 80, 120, null, null);
+		System.out.println("num output values = " + values.length);
 		
 		//print the result
 		displayOutput(values);
