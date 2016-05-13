@@ -1,4 +1,5 @@
-/*
+
+import java.util.*;/*
  Copyright (c) 2016 Nick Gable
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,18 +22,45 @@
  */
 
 
-import java.util.*;
-
-public class Main
+public class BGAnalyzer
 {
-	//this function is really just to test the BGAnalyzer class
-	public static void main(String[] args)
+	public class InputReading{
+		public Date time = null;
+		public int reading = 0;
+	}
+	
+	public class OutputValue {
+		public enum BGRange {LOW, IN_RANGE, HIGH, NOT_SET}
+		public Date time = null;
+		public int average = 0;
+		public BGRange averagerange = BGRange.NOT_SET;
+		public int daysinaveragerange = 0;
+		public int totaldays = 0;
+	}
+	
+	public static OutputValue[] analyzeBG(InputReading [] readings, int bgrangelow, int bgrangehigh, Date starttime, Date endtime){
+		for (InputReading reading : readings){
+			if (!isInTimeRange(reading.time, starttime, endtime)){
+				
+			}
+		}
+		
+		
+		return null;
+	}
+
+	private static boolean isInTimeRange(Date time, Date starttime, Date endtime)
 	{
-		// read test file
+		if (time == null) return false;
 		
+		if (starttime != null){
+			if (time.before(starttime)) return false;
+		}
 		
-		//send the data to BGAnalyzer
+		if (endtime != null){
+			if (time.after(endtime)) return false;
+		}
 		
-		//print the result
+		return true;
 	}
 }
