@@ -58,7 +58,7 @@ public class Main
 			
 			String line;
 			
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			
 			int totalcount =0;
 			int readcount = 0;

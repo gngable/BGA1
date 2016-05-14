@@ -51,7 +51,7 @@ public class BGAnalyzer
 	{
 		List<OutputValue> output = new ArrayList<>();
 		
-		for (int hour = 0; hour <= 24; hour++)
+		for (int hour = 0; hour < 24; hour++)
 		{
 			List<Integer> bg = new ArrayList<>();
 			
