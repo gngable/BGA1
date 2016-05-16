@@ -35,6 +35,7 @@ public class Main
 	{
 		int rangelow = 80;
 		int rangehigh = 180;
+		int slicesperhour = 4;
 		
 		System.out.println(getDisclaimer());
 		System.out.println("CWD is " + System.getProperty("user.dir"));
@@ -44,17 +45,17 @@ public class Main
 		
 		
 		//send the data to BGAnalyzer
-		BGAnalyzer.OutputValue[] values = BGAnalyzer.analyzeBG(readings, rangelow, rangehigh, null, null);
+		BGAnalyzer.OutputValue[] values = BGAnalyzer.analyzeBG(readings, rangelow, rangehigh, null, null, slicesperhour);
 		System.out.println("num output values = " + values.length);
 		
 		//print the result
-		System.out.println(BGAnalyzer.getOutput(values, rangelow, rangehigh));
+		System.out.println(BGAnalyzer.getOutput(values, rangelow, rangehigh, slicesperhour));
 		System.out.println(getDisclaimer());
 		
 		try{
 			PrintWriter pw = new PrintWriter("/storage/emulated/0/AppProjects/BGA1/output.txt");
 			pw.println(getDisclaimer());
-			pw.println(BGAnalyzer.getOutput(values, rangelow, rangehigh));
+			pw.println(BGAnalyzer.getOutput(values, rangelow, rangehigh, slicesperhour));
 			pw.println(getDisclaimer());
 			pw.close();
 		} catch(Exception ex){

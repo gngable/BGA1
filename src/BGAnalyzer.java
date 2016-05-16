@@ -4,7 +4,7 @@ import BGAnalyzer.*;
 
 /*
  MIT License
- 
+
  Copyright (c) 2016 Nick Gable (Servant Software)
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,6 +43,7 @@ public class BGAnalyzer
 		public enum BGRange
 		{LOW, IN_RANGE, HIGH, NOT_SET}
 		public int hour = -1;
+		public int slice= 0;
 		public int average = 0;
 		public BGRange averagerange = BGRange.NOT_SET;
 		public int readingsinaveragerange = 0;
@@ -56,55 +57,75 @@ public class BGAnalyzer
 	}
 
 	//this is the main function that is called to analyze BG readings
-	public static OutputValue[] analyzeBG(InputReading [] readings, int bgrangelow, int bgrangehigh, Date starttime, Date endtime)
+	public static OutputValue[] analyzeBG(InputReading [] readings, int bgrangelow, int bgrangehigh, Date starttime, Date endtime, int slicesperhour)
 	{
 		List<OutputValue> output = new ArrayList<>();
-		
+
 		//compute the overall statistics
 		{
 			Integer[] bg = new Integer[readings.length];
-			
-			for(int i = 0; i < readings.length; i++){
+
+			for (int i = 0; i < readings.length; i++)
+			{
 				bg[i] = new Integer(readings[i].reading);
 			} 
-			
-			output.add(computeOutputValue(bg, -1, bgrangelow, bgrangehigh));
+
+			output.add(computeOutputValue(bg, -1, -1, bgrangelow, bgrangehigh));
 		}
-		
+
+		//compute by hour and slice
 		for (int hour = 0; hour < 24; hour++)
 		{
-			List<Integer> bg = new ArrayList<>();
-			
-			for (InputReading reading : readings)
+			for (int slice = 0; slice < slicesperhour; slice++)
 			{
-				if (isInTimeRange(reading.time, starttime, endtime) && isInHour(reading.time, hour))
+				List<Integer> bg = new ArrayList<>();
+
+				for (InputReading reading : readings)
 				{
-					bg.add(reading.reading);
+					if (isInTimeRange(reading.time, starttime, endtime) && isInHour(reading.time, hour) && isInSlice(reading.time, slice, slicesperhour))
+					{
+						bg.add(reading.reading);
+					}
+					else
+					{
+						continue;
+					}
 				}
-				else
-				{
-					continue;
-				}
+
+				if (!bg.isEmpty()) output.add(computeOutputValue(bg.toArray(new Integer[bg.size()]), hour, slice, bgrangelow, bgrangehigh));
+				else System.out.println("There are no readings for hour " + hour);
 			}
-			
-			if (!bg.isEmpty()) output.add(computeOutputValue(bg.toArray(new Integer[bg.size()]), hour, bgrangelow, bgrangehigh));
-			else System.out.println("There are no readings for hour " + hour);
 		}
 
 
 		return output.toArray(new OutputValue[output.size()]);
 	}
-	
-	public static String getOutput(BGAnalyzer.OutputValue[] values, int lowrange, int highrange)
+
+	private static boolean isInSlice(Date time, int slice, int slicesperhour)
+	{
+		Calendar c = new GregorianCalendar();
+		c.setTime(time);
+		
+		int minutesinslice = (60 / slicesperhour);
+		
+		if (c.get(Calendar.MINUTE) >= slice * minutesinslice
+		&& c.get(Calendar.MINUTE) < (slice + 1) * minutesinslice){
+			return true;
+		}
+		
+		return false;
+	}
+
+	public static String getOutput(BGAnalyzer.OutputValue[] values, int lowrange, int highrange, int slicesperhour)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Normal range is " + lowrange + " to " + highrange + "\n");
-		sb.append("hour\tlabel\taverge\treadings in average/total\tlow/total\tin range/total\thigh/total\t% low\t% in range\t% high\n");
+		sb.append("start time\tend time\tlabel\taverge\treadings in average/total\tlow/total\tin range/total\thigh/total\t% low\t% in range\t% high\n");
 
-		for ( OutputValue value : values){
-
-
-			sb.append((value.hour == -1 ? "ALL" : value.hour)
+		for (OutputValue value : values)
+		{
+			sb.append((value.hour == -1 ? "ALL" : sliceToTime(value.hour, value.slice, slicesperhour))
+					  + "\t" + (value.hour == -1 ? "ALL" : sliceToTime(value.hour, value.slice + 1, slicesperhour))
 					  + "\t" + value.averagerange
 					  + "\t" + value.average
 					  + "\t" + value.readingsinaveragerange + "/" + value.totalreadings
@@ -119,30 +140,71 @@ public class BGAnalyzer
 		return sb.toString();
 	}
 
-	private static BGAnalyzer.OutputValue computeOutputValue(Integer[] bg, int hour, int bgrangelow, int bgrangehigh)
+	private static String sliceToTime(int hour, int slice, int slicesperhour)
+	{
+		String hourstr = "";
+		String ampm = "";
+		
+		String minute = Integer.toString(((60 / slicesperhour) * slice));
+
+		if (minute.compareTo("60") == 0){
+			hour++;
+
+			if (hour == 24) hour = 0;
+
+			minute = "00";
+		}
+
+		if (minute.length() == 1) minute = "0" + minute;
+		
+		if (hour == 0){
+			hourstr = "12";
+			ampm = " am";
+		} else if (hour < 12){
+			hourstr = Integer.toString(hour);
+			ampm = " am";
+		} else if (hour == 12){
+			hourstr = Integer.toString(hour);
+			ampm = " pm";
+		} else {
+			hourstr = Integer.toString(hour - 12);
+			ampm = " pm";
+		}
+		
+		return hourstr + ":" + minute + ampm;
+	}
+
+	private static BGAnalyzer.OutputValue computeOutputValue(Integer[] bg, int hour, int slice, int bgrangelow, int bgrangehigh)
 	{
 		OutputValue output = new OutputValue();
-		
+
 		output.totalreadings = bg.length;
 		output.hour = hour;
-		
+		output.slice = slice;
+
 		int totalbg = 0;
 		int totallow = 0;
 		int totalinrange = 0;
 		int totalhigh = 0;
-		
-		for (Integer reading : bg){
+
+		for (Integer reading : bg)
+		{
 			totalbg += reading;
-			
-			if (reading < bgrangelow){
+
+			if (reading < bgrangelow)
+			{
 				totallow++;
-			} else if (reading > bgrangehigh){
+			}
+			else if (reading > bgrangehigh)
+			{
 				totalhigh++;
-			} else {
+			}
+			else
+			{
 				totalinrange++;
 			}
 		}
-		
+
 		output.average = totalbg / bg.length;
 		output.readingslow = totallow;
 		output.readingsinrange = totalinrange;
@@ -150,18 +212,23 @@ public class BGAnalyzer
 		output.percenthigh = (int)(((double)totalhigh / (double)bg.length) * 100.0);
 		output.percentinrange = (int)(((double)totalinrange / (double)bg.length) * 100.0);
 		output.percentlow = (int)(((double)totallow / (double)bg.length) * 100.0);
-		
-		if (output.average < bgrangelow){
+
+		if (output.average < bgrangelow)
+		{
 			output.averagerange = OutputValue.BGRange.LOW;
 			output.readingsinaveragerange = totallow;
-		} else if (output.average > bgrangehigh){
+		}
+		else if (output.average > bgrangehigh)
+		{
 			output.averagerange = OutputValue.BGRange.HIGH;
 			output.readingsinaveragerange = totalhigh;
-		} else {
+		}
+		else
+		{
 			output.averagerange = OutputValue.BGRange.IN_RANGE;
 			output.readingsinaveragerange = totalinrange;
 		}
-		
+
 		return output;
 	}
 
@@ -169,10 +236,11 @@ public class BGAnalyzer
 	{
 		Calendar c = new GregorianCalendar();
 		c.setTime(time);
-		if (c.get(Calendar.HOUR_OF_DAY) == hour){
+		if (c.get(Calendar.HOUR_OF_DAY) == hour)
+		{
 			return true;
 		}
-		
+
 		return false;
 	}
 
