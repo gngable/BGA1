@@ -33,6 +33,9 @@ public class Main
 	//this function is really just to test the BGAnalyzer class
 	public static void main(String[] args)
 	{
+		int rangelow = 80;
+		int rangehigh = 180;
+		
 		displyWarning();
 		System.out.println("CWD is " + System.getProperty("user.dir"));
 		// read test file
@@ -41,11 +44,11 @@ public class Main
 		
 		
 		//send the data to BGAnalyzer
-		BGAnalyzer.OutputValue[] values = BGAnalyzer.analyzeBG(readings, 80, 180, null, null);
+		BGAnalyzer.OutputValue[] values = BGAnalyzer.analyzeBG(readings, rangelow, rangehigh, null, null);
 		System.out.println("num output values = " + values.length);
 		
 		//print the result
-		displayOutput(values);
+		displayOutput(values, rangelow, rangehigh);
 		displyWarning();
 	}
 
@@ -57,17 +60,20 @@ public class Main
 		System.out.println("************************");
 	}
 
-	private static void displayOutput(BGAnalyzer.OutputValue[] values)
+	private static void displayOutput(BGAnalyzer.OutputValue[] values, int lowrange, int highrange)
 	{
-		System.out.println("hour\tlabel\taverge\treadings in average\t% low\t% in range\t% high");
+		System.out.println("hour\tlabel\taverge\treadings in average/total\tlow/total\tin range/total\thigh/total\t% low\t% in range\t% high");
 		
 		for ( OutputValue value : values){
 			
 			
-			System.out.println(value.hour
+			System.out.println((value.hour == -1 ? "ALL" : value.hour)
 			+ "\t" + value.averagerange
 			+ "\t" + value.average
-			+ "\t" + value.readingsinaveragerange + " of " + value.totalreadings
+			+ "\t" + value.readingsinaveragerange + "/" + value.totalreadings
+			+ "\t" + value.readingslow + "/" + value.totalreadings
+			+ "\t" + value.readingsinrange + "/" + value.totalreadings
+			+ "\t" + value.readingshigh + "/" + value.totalreadings
 			+ "\t" + value.percentlow
 			+ "\t" + value.percentinrange
 			+ "\t" + value.percenthigh);

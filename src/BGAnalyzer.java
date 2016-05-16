@@ -29,12 +29,15 @@ import BGAnalyzer.*;
 
 public class BGAnalyzer
 {
+	//this is a container class for readings from a meter
 	public static class InputReading
 	{
 		public Date time = null;
 		public int reading = 0;
 	}
 
+	//this is a container class for analysis output. 
+	//there is one OutputValue per hour.
 	public static class OutputValue
 	{
 		public enum BGRange
@@ -44,14 +47,29 @@ public class BGAnalyzer
 		public BGRange averagerange = BGRange.NOT_SET;
 		public int readingsinaveragerange = 0;
 		public int totalreadings = 0;
+		public int readingslow = 0;
+		public int readingsinrange = 0;
+		public int readingshigh = 0;
 		public int percentlow = 0;
 		public int percentinrange = 0;
 		public int percenthigh = 0;
 	}
 
+	//this is the main function that is called to analyze BG readings
 	public static OutputValue[] analyzeBG(InputReading [] readings, int bgrangelow, int bgrangehigh, Date starttime, Date endtime)
 	{
 		List<OutputValue> output = new ArrayList<>();
+		
+		//compute the overall statistics
+		{
+			Integer[] bg = new Integer[readings.length];
+			
+			for(int i = 0; i < readings.length; i++){
+				bg[i] = new Integer(readings[i].reading);
+			} 
+			
+			output.add(computeOutputValue(bg, -1, bgrangelow, bgrangehigh));
+		}
 		
 		for (int hour = 0; hour < 24; hour++)
 		{
@@ -69,7 +87,7 @@ public class BGAnalyzer
 				}
 			}
 			
-			if (!bg.isEmpty()) output.add(computeOutputValue(bg, hour, bgrangelow, bgrangehigh));
+			if (!bg.isEmpty()) output.add(computeOutputValue(bg.toArray(new Integer[bg.size()]), hour, bgrangelow, bgrangehigh));
 			else System.out.println("There are no readings for hour " + hour);
 		}
 
@@ -77,11 +95,11 @@ public class BGAnalyzer
 		return output.toArray(new OutputValue[output.size()]);
 	}
 
-	private static BGAnalyzer.OutputValue computeOutputValue(List<Integer> bg, int hour, int bgrangelow, int bgrangehigh)
+	private static BGAnalyzer.OutputValue computeOutputValue(Integer[] bg, int hour, int bgrangelow, int bgrangehigh)
 	{
 		OutputValue output = new OutputValue();
 		
-		output.totalreadings = bg.size();
+		output.totalreadings = bg.length;
 		output.hour = hour;
 		
 		int totalbg = 0;
@@ -101,10 +119,13 @@ public class BGAnalyzer
 			}
 		}
 		
-		output.average = totalbg / bg.size();
-		output.percenthigh = (int)(((double)totalhigh / (double)bg.size()) * 100.0);
-		output.percentinrange = (int)(((double)totalinrange / (double)bg.size()) * 100.0);
-		output.percentlow = (int)(((double)totallow / (double)bg.size()) * 100.0);
+		output.average = totalbg / bg.length;
+		output.readingslow = totallow;
+		output.readingsinrange = totalinrange;
+		output.readingshigh = totalhigh;
+		output.percenthigh = (int)(((double)totalhigh / (double)bg.length) * 100.0);
+		output.percentinrange = (int)(((double)totalinrange / (double)bg.length) * 100.0);
+		output.percentlow = (int)(((double)totallow / (double)bg.length) * 100.0);
 		
 		if (output.average < bgrangelow){
 			output.averagerange = OutputValue.BGRange.LOW;
