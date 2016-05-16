@@ -48,7 +48,7 @@ public class Main
 		System.out.println("num output values = " + values.length);
 		
 		//print the result
-		System.out.println(getOutput(values, rangelow, rangehigh));
+		System.out.println(BGAnalyzer.getOutput(values, rangelow, rangehigh));
 		System.out.println(getDisclaimer());
 	}
 
@@ -58,30 +58,6 @@ public class Main
 		"This repot is for informational purposes only and should not be used to make medical decisions." +
 		"The author of the software that generated this report assumes no responsibility or liability." +
 		"************************";
-	}
-
-	private static String getOutput(BGAnalyzer.OutputValue[] values, int lowrange, int highrange)
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("Normal range is " + lowrange + " to " + highrange + "\n");
-		sb.append("hour\tlabel\taverge\treadings in average/total\tlow/total\tin range/total\thigh/total\t% low\t% in range\t% high\n");
-		
-		for ( OutputValue value : values){
-			
-			
-			sb.append((value.hour == -1 ? "ALL" : value.hour)
-			+ "\t" + value.averagerange
-			+ "\t" + value.average
-			+ "\t" + value.readingsinaveragerange + "/" + value.totalreadings
-			+ "\t" + value.readingslow + "/" + value.totalreadings
-			+ "\t" + value.readingsinrange + "/" + value.totalreadings
-			+ "\t" + value.readingshigh + "/" + value.totalreadings
-			+ "\t" + value.percentlow
-			+ "\t" + value.percentinrange
-			+ "\t" + value.percenthigh + "\n");
-		}
-		
-		return sb.toString();
 	}
 	
 	public static BGAnalyzer.InputReading[] readFile(String filename){

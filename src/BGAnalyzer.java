@@ -94,6 +94,30 @@ public class BGAnalyzer
 
 		return output.toArray(new OutputValue[output.size()]);
 	}
+	
+	public static String getOutput(BGAnalyzer.OutputValue[] values, int lowrange, int highrange)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("Normal range is " + lowrange + " to " + highrange + "\n");
+		sb.append("hour\tlabel\taverge\treadings in average/total\tlow/total\tin range/total\thigh/total\t% low\t% in range\t% high\n");
+
+		for ( OutputValue value : values){
+
+
+			sb.append((value.hour == -1 ? "ALL" : value.hour)
+					  + "\t" + value.averagerange
+					  + "\t" + value.average
+					  + "\t" + value.readingsinaveragerange + "/" + value.totalreadings
+					  + "\t" + value.readingslow + "/" + value.totalreadings
+					  + "\t" + value.readingsinrange + "/" + value.totalreadings
+					  + "\t" + value.readingshigh + "/" + value.totalreadings
+					  + "\t" + value.percentlow
+					  + "\t" + value.percentinrange
+					  + "\t" + value.percenthigh + "\n");
+		}
+
+		return sb.toString();
+	}
 
 	private static BGAnalyzer.OutputValue computeOutputValue(Integer[] bg, int hour, int bgrangelow, int bgrangehigh)
 	{
