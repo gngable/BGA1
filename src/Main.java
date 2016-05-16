@@ -50,13 +50,23 @@ public class Main
 		//print the result
 		System.out.println(BGAnalyzer.getOutput(values, rangelow, rangehigh));
 		System.out.println(getDisclaimer());
+		
+		try{
+			PrintWriter pw = new PrintWriter("/storage/emulated/0/AppProjects/BGA1/output.txt");
+			pw.println(getDisclaimer());
+			pw.println(BGAnalyzer.getOutput(values, rangelow, rangehigh));
+			pw.println(getDisclaimer());
+			pw.close();
+		} catch(Exception ex){
+			System.out.println("problem writing output to file: " + ex.getMessage());
+		}
 	}
 
 	private static String getDisclaimer()
 	{
-		return "************************" +
-		"This repot is for informational purposes only and should not be used to make medical decisions." +
-		"The author of the software that generated this report assumes no responsibility or liability." +
+		return "************************\n" +
+		"This report is for informational purposes only and should not be used to make medical decisions.\n" +
+		"The author of the software that generated this report assumes no responsibility or liability.\n" +
 		"************************";
 	}
 	
