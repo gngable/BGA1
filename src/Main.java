@@ -36,7 +36,7 @@ public class Main
 		int rangelow = 80;
 		int rangehigh = 180;
 		
-		displyWarning();
+		System.out.println(getDisclaimer());
 		System.out.println("CWD is " + System.getProperty("user.dir"));
 		// read test file
 		BGAnalyzer.InputReading[] readings = readFile("/storage/emulated/0/AppProjects/BGA1/bloodglucosetestdata.txt");
@@ -48,26 +48,28 @@ public class Main
 		System.out.println("num output values = " + values.length);
 		
 		//print the result
-		displayOutput(values, rangelow, rangehigh);
-		displyWarning();
+		System.out.println(getOutput(values, rangelow, rangehigh));
+		System.out.println(getDisclaimer());
 	}
 
-	private static void displyWarning()
+	private static String getDisclaimer()
 	{
-		System.out.println("************************");
-		System.out.println("This repot is for informational purposes only and should not be used to make medical decisions.");
-		System.out.println("The author of the software that generated this report assumes no responsibility or liability.");
-		System.out.println("************************");
+		return "************************" +
+		"This repot is for informational purposes only and should not be used to make medical decisions." +
+		"The author of the software that generated this report assumes no responsibility or liability." +
+		"************************";
 	}
 
-	private static void displayOutput(BGAnalyzer.OutputValue[] values, int lowrange, int highrange)
+	private static String getOutput(BGAnalyzer.OutputValue[] values, int lowrange, int highrange)
 	{
-		System.out.println("hour\tlabel\taverge\treadings in average/total\tlow/total\tin range/total\thigh/total\t% low\t% in range\t% high");
+		StringBuilder sb = new StringBuilder();
+		sb.append("Normal range is " + lowrange + " to " + highrange + "\n");
+		sb.append("hour\tlabel\taverge\treadings in average/total\tlow/total\tin range/total\thigh/total\t% low\t% in range\t% high\n");
 		
 		for ( OutputValue value : values){
 			
 			
-			System.out.println((value.hour == -1 ? "ALL" : value.hour)
+			sb.append((value.hour == -1 ? "ALL" : value.hour)
 			+ "\t" + value.averagerange
 			+ "\t" + value.average
 			+ "\t" + value.readingsinaveragerange + "/" + value.totalreadings
@@ -76,8 +78,10 @@ public class Main
 			+ "\t" + value.readingshigh + "/" + value.totalreadings
 			+ "\t" + value.percentlow
 			+ "\t" + value.percentinrange
-			+ "\t" + value.percenthigh);
+			+ "\t" + value.percenthigh + "\n");
 		}
+		
+		return sb.toString();
 	}
 	
 	public static BGAnalyzer.InputReading[] readFile(String filename){
