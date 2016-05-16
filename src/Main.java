@@ -1,4 +1,6 @@
 /*
+ MIT License
+ 
  Copyright (c) 2016 Nick Gable (Servant Software)
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,6 +33,7 @@ public class Main
 	//this function is really just to test the BGAnalyzer class
 	public static void main(String[] args)
 	{
+		displyWarning();
 		System.out.println("CWD is " + System.getProperty("user.dir"));
 		// read test file
 		BGAnalyzer.InputReading[] readings = readFile("/storage/emulated/0/AppProjects/BGA1/bloodglucosetestdata.txt");
@@ -38,16 +41,37 @@ public class Main
 		
 		
 		//send the data to BGAnalyzer
-		BGAnalyzer.OutputValue[] values = BGAnalyzer.analyzeBG(readings, 80, 120, null, null);
+		BGAnalyzer.OutputValue[] values = BGAnalyzer.analyzeBG(readings, 80, 180, null, null);
 		System.out.println("num output values = " + values.length);
 		
 		//print the result
 		displayOutput(values);
+		displyWarning();
+	}
+
+	private static void displyWarning()
+	{
+		System.out.println("************************");
+		System.out.println("This repot is for informational purposes only and should not be used to make medical decisions.");
+		System.out.println("The author of the software that generated this report assumes no responsibility or liability.");
+		System.out.println("************************");
 	}
 
 	private static void displayOutput(BGAnalyzer.OutputValue[] values)
 	{
+		System.out.println("hour\tlabel\taverge\treadings in average\t% low\t% in range\t% high");
 		
+		for ( OutputValue value : values){
+			
+			
+			System.out.println(value.hour
+			+ "\t" + value.averagerange
+			+ "\t" + value.average
+			+ "\t" + value.readingsinaveragerange + " of " + value.totalreadings
+			+ "\t" + value.percentlow
+			+ "\t" + value.percentinrange
+			+ "\t" + value.percenthigh);
+		}
 	}
 	
 	public static BGAnalyzer.InputReading[] readFile(String filename){

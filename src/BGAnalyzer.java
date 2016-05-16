@@ -3,6 +3,8 @@ import java.util.*;
 import BGAnalyzer.*;
 
 /*
+ MIT License
+ 
  Copyright (c) 2016 Nick Gable (Servant Software)
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -100,9 +102,9 @@ public class BGAnalyzer
 		}
 		
 		output.average = totalbg / bg.size();
-		output.percenthigh = ((totalhigh / bg.size()) * 100);
-		output.percentinrange = ((totalinrange / bg.size()) * 100);
-		output.percentlow = ((totallow / bg.size()) * 100);
+		output.percenthigh = (int)(((double)totalhigh / (double)bg.size()) * 100.0);
+		output.percentinrange = (int)(((double)totalinrange / (double)bg.size()) * 100.0);
+		output.percentlow = (int)(((double)totallow / (double)bg.size()) * 100.0);
 		
 		if (output.average < bgrangelow){
 			output.averagerange = OutputValue.BGRange.LOW;
