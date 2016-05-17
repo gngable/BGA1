@@ -40,7 +40,7 @@ public class Main
 		System.out.println(getDisclaimer());
 		System.out.println("CWD is " + System.getProperty("user.dir"));
 		// read test file
-		BGAnalyzer.InputReading[] readings = readFile("/storage/emulated/0/AppProjects/BGA1/bloodglucosetestdata.txt");
+		BGAnalyzer.InputReading[] readings = readFile("/storage/emulated/0/AppProjects/BGA1/test_data_5-17-2016.txt");
 		System.out.println("Read " + readings.length + " records from the file");
 		
 		
